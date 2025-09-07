@@ -1,0 +1,241 @@
+:root {
+    --bg-color: #0d1117;
+    --star-color: #ffffff;
+    --glow-color: rgba(173, 216, 230, 0.8);
+    --line-color: rgba(255, 215, 0, 0.6);
+    --modal-bg: #161b22;
+    --text-color: #c9d1d9;
+}
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    position: relative;
+    height: 100vh;
+    width: 100vw;
+}
+
+/* NOVO: Estilos para o Header fixo */
+#main-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    padding: 15px;
+    background: linear-gradient(to bottom, rgba(13, 17, 23, 0.8), transparent);
+    z-index: 10;
+    pointer-events: none; /* Permite que o toque "atravesse" o header */
+}
+
+#main-header h1 {
+    margin: 0;
+    font-size: 1.5em;
+    font-weight: 500;
+    color: var(--text-color);
+    text-shadow: 0 0 5px black;
+}
+
+/* Tela de Carregamento */
+#loading-screen {
+    position: fixed; z-index: 100; top: 0; left: 0; width: 100%; height: 100%;
+    background: var(--bg-color); display: flex; flex-direction: column;
+    justify-content: center; align-items: center; transition: opacity 0.8s ease;
+}
+#loading-screen:not(.active) { opacity: 0; pointer-events: none; }
+.spinner { width: 50px; height: 50px; border: 4px solid #30363d;
+    border-top-color: #58a6ff; border-radius: 50%; animation: spin 1s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Universo e Campo Estelar */
+#universe {
+    width: 100%; height: 100%; cursor: grab;
+}
+
+#starfield {
+    position: relative; width: 200vw; height: 200vh;
+    transform-origin: 0 0;
+    /* MUDANÇA: Transição de transform agora é mais detalhada para o zoom */
+    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.star {
+    position: absolute; width: 12px; height: 12px;
+    background: var(--star-color); border-radius: 50%;
+    box-shadow: 0 0 12px var(--glow-color);
+    transform: translate(-50%, -50%); cursor: pointer;
+    animation: pulse 2s infinite alternate ease-in-out;
+    /* MUDANÇA: Adiciona transição para o desaparecimento */
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+@keyframes pulse {
+    from { transform: translate(-50%, -50%) scale(0.9); }
+    to { transform: translate(-50%, -50%) scale(1.1); }
+}
+
+/* NOVO: Classe para a estrela que some */
+.star.vanished {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0);
+    pointer-events: none; /* Impede que seja clicada novamente */
+}
+
+.constellation-line {
+    position: absolute; background-color: var(--line-color);
+    transform-origin: 0 0; opacity: 0; transition: opacity 1s ease 0.5s;
+}
+
+/* Card de Memória (Modal Mobile) */
+#memory-modal {
+    position: fixed; bottom: 0; left: 0; width: 100%;
+    background-color: var(--modal-bg); border-top: 1px solid #30363d;
+    border-radius: 20px 20px 0 0;
+    transform: translateY(100%);
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 50; padding: 20px; padding-top: 30px;
+    max-height: 80vh; overflow-y: auto;
+}
+#memory-modal.active { transform: translateY(0); }
+.modal-handle { position: absolute; top: 10px; left: 50%;
+    transform: translateX(-50%); width: 40px; height: 5px;
+    background: #484f58; border-radius: 3px;
+}
+.constellation-line {
+    /* Essencial para a visibilidade */
+    background-color: rgba(255, 255, 255, 0.4); /* Cor da linha (branco semitransparente) */
+    height: 1px;                              /* Espessura da linha */
+
+    /* Essencial para o posicionamento */
+    position: absolute;
+
+    /* A 'mágica' para a rotação funcionar certo! */
+    transform-origin: 0 0; /* Define que a rotação deve partir do canto superior esquerdo (ponto inicial) */
+
+    /* Efeito visual opcional */
+    opacity: 0;
+    transition: opacity 1.5s ease-out;
+}
+
+/* Classe para mostrar as linhas quando a constelação for revelada */
+body.final-reveal .constellation-line {
+    opacity: 1;
+}
+#memory-content h2 { 
+    margin-top: 0; 
+    color: #58a6ff; 
+    text-align: center;
+}
+
+#memory-content img { 
+    max-width: 150px;  /* Reduzido de 300px para 200px */
+    width: 100%;
+    height: 150px;  /* Reduzido de 300px para 200px */
+    object-fit: cover;
+    border-radius: 50%;
+    margin: 15px auto;  /* Reduzido de 20px para 15px */
+    display: block;
+    border: 2px solid var(--glow-color);  /* Reduzido de 3px para 2px */
+    box-shadow: 0 0 10px var(--glow-color);  /* Reduzido de 15px para 10px */
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.memory-content-unlocked { animation: fadeIn 1s ease-out forwards; }
+#memory-content p { 
+    line-height: 1.6;
+    text-align: center;
+    margin: 15px 0;
+}
+/* Estilos do Player de Áudio */
+.audio-player {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    padding: 15px;
+    margin: 15px 0;
+}
+
+.play-audio-button {
+    background-color: #238636;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.play-audio-button:hover {
+    background-color: #2ea043;
+}
+
+.audio-progress {
+    background: rgba(255, 255, 255, 0.1);
+    height: 4px;
+    border-radius: 2px;
+    margin: 10px 0;
+    position: relative;
+    cursor: pointer;
+}
+
+.progress-bar {
+    background: #58a6ff;
+    height: 100%;
+    border-radius: 2px;
+    width: 0;
+    transition: width 0.1s linear;
+}
+
+.audio-time {
+    font-size: 0.8em;
+    color: #8b949e;
+    text-align: right;
+}
+
+/* Estilos do Player de Vídeo */
+.memory-video {
+    max-width: 280px;  /* Reduzido de 400px para 280px */
+    width: 100%;
+    border-radius: 15px;  /* Reduzido de 20px para 15px */
+    margin: 15px auto;  /* Reduzido de 20px para 15px */
+    display: block;
+    background: #000;
+    border: 1px solid var(--glow-color);  /* Reduzido de 2px para 1px */
+    box-shadow: 0 0 8px rgba(173, 216, 230, 0.3);  /* Reduzido de 15px para 8px */
+}
+
+/* NOVO: Classe que aplica o zoom no universo */
+body.zoomed-in #universe {
+    pointer-events: none; /* Desativa o arrastar enquanto o modal está aberto */
+}.close-modal-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    background: transparent;
+    border: none;
+    color: var(--text-color);
+    font-size: 2.5rem; /* Tamanho grande para ser fácil de tocar */
+    font-weight: 300;
+    line-height: 1;
+    padding: 0;
+    cursor: pointer;
+    z-index: 51; /* Garante que fique acima do conteúdo */
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.close-modal-btn:hover {
+    color: #ffffff;
+    transform: scale(1.1);
+}
